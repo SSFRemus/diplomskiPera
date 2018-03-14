@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "418877411423",
+    "firebase_url": "https://diplomski-1c3d2.firebaseio.com",
+    "project_id": "diplomski-1c3d2",
+    "storage_bucket": "diplomski-1c3d2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418877411423:android:536f58dff55aa839",
+        "android_client_info": {
+          "package_name": "com.vidovic.petar.diplomski"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "418877411423-d1sai8nlbsr6vb8geb33bfhqbv0mqu5c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABvC_XCymDWLGiaulehLxG2cIFcbTDtEI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
