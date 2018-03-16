@@ -25,6 +25,7 @@ public class PublicReservationsActivity extends AppCompatActivity implements Wee
         setContentView(R.layout.activity_public_reservations);
 
         weekView = findViewById(R.id.weekView);
+        weekView.goToHour(8);
 
         weekView.setOnEventClickListener(this);
         weekView.setMonthChangeListener(this);
@@ -51,7 +52,48 @@ public class PublicReservationsActivity extends AppCompatActivity implements Wee
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
         List<WeekViewEvent> events = new ArrayList<>();
 
+        greyOutNonWorkingHours(events, newYear, newMonth);
+
         return events;
+    }
+
+    private void greyOutNonWorkingHours(List<WeekViewEvent> events, int newYear, int newMonth) {
+        int daysInCurrentMonth = Calendar.getInstance().getMaximum(Calendar.DAY_OF_MONTH);
+
+        for (int i = 0; i < daysInCurrentMonth; i++) {
+            Calendar startTime = Calendar.getInstance();
+            Calendar endTime;
+            WeekViewEvent event;
+
+            startTime.set(Calendar.DAY_OF_MONTH, i + 1);
+            startTime.set(Calendar.HOUR_OF_DAY, 0);
+            startTime.set(Calendar.MINUTE, 0);
+            startTime.set(Calendar.MONTH, newMonth - 1);
+            startTime.set(Calendar.YEAR, newYear);
+
+            endTime = (Calendar) startTime.clone();
+            endTime.add(Calendar.HOUR, 8);
+            endTime.set(Calendar.MONTH, newMonth - 1);
+
+            event = new WeekViewEvent(1, "", startTime, endTime);
+            event.setColor(getResources().getColor(R.color.greyColor));
+            events.add(event);
+
+            startTime = Calendar.getInstance();
+            startTime.set(Calendar.DAY_OF_MONTH, i + 1);
+            startTime.set(Calendar.HOUR_OF_DAY, 22);
+            startTime.set(Calendar.MINUTE, 0);
+            startTime.set(Calendar.MONTH, newMonth - 1);
+            startTime.set(Calendar.YEAR, newYear);
+
+            endTime = (Calendar) startTime.clone();
+            endTime.add(Calendar.HOUR, 2);
+            endTime.set(Calendar.MONTH, newMonth - 1);
+
+            event = new WeekViewEvent(2, "", startTime, endTime);
+            event.setColor(getResources().getColor(R.color.greyColor));
+            events.add(event);
+        }
     }
 
     @Override
