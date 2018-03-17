@@ -1,9 +1,11 @@
-package com.vidovic.petar.diplomski;
+package com.vidovic.petar.diplomski.activity;
 
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.vidovic.petar.diplomski.R;
 
 public class SplashActivity extends AppCompatActivity {
 
