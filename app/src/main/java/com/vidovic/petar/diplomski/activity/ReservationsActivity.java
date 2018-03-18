@@ -1,7 +1,6 @@
 package com.vidovic.petar.diplomski.activity;
 
 import android.graphics.RectF;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -15,6 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.vidovic.petar.diplomski.R;
+import com.vidovic.petar.diplomski.manager.DatabaseManager;
 import com.vidovic.petar.diplomski.model.Event;
 
 import java.text.SimpleDateFormat;
@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class ReservationsActivity extends AppCompatActivity implements MonthLoader.MonthChangeListener, WeekView.EventClickListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
 
-    public WeekView weekView;
-    public static List<WeekViewEvent> currentMonthEvents = new ArrayList<>();
+    private WeekView weekView;
 
     public static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("events");
 
@@ -61,10 +61,22 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
     }
 
     @Override
-    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+    public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
         final List<WeekViewEvent> events = new ArrayList<>();
 
-        events.addAll(currentMonthEvents);
+        final List<WeekViewEvent> newMonthEvents = new ArrayList<>();
+
+        DatabaseManager.fetchedEvents.forEach(new Consumer<WeekViewEvent>() {
+            @Override
+            public void accept(WeekViewEvent weekViewEvent) {
+                if (weekViewEvent.getStartTime().get(Calendar.MONTH) == newMonth - 1 &&
+                        weekViewEvent.getStartTime().get(Calendar.YEAR) == newYear) {
+                    newMonthEvents.add(weekViewEvent);
+                }
+            }
+        });
+
+        events.addAll(newMonthEvents);
 
         greyOutNonWorkingHours(events, newYear, newMonth);
 
@@ -136,13 +148,7 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
         databaseReference.child(year).child(month).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                currentMonthEvents.clear();
-
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    currentMonthEvents.add(child.getValue(Event.class).toWeekViewEvent());
-                }
-
-                onMonthChange(finalTime.get(Calendar.YEAR), finalTime.get(Calendar.MONTH));
+                fetchEvents(finalTime.get(Calendar.YEAR), finalTime.get(Calendar.MONTH) + 1 );
             }
 
             @Override
@@ -156,5 +162,56 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
 
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
+    }
+
+    private void fetchEvents(final int newYear, final int newMonth) {
+        final String year = Integer.toString(newYear);
+        final String month = Integer.toString(newMonth);
+        final String previousMonth = Integer.toString(newMonth - 1);
+        final String nextMonth = Integer.toString(newMonth + 1);
+
+        DatabaseManager.fetchedEvents.clear();
+
+        databaseReference.child(year).child(month).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    DatabaseManager.fetchedEvents.add(child.getValue(Event.class).toWeekViewEvent());
+                }
+
+                databaseReference.child(year).child(previousMonth).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            DatabaseManager.fetchedEvents.add(child.getValue(Event.class).toWeekViewEvent());
+                        }
+
+                        databaseReference.child(year).child(nextMonth).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                    DatabaseManager.fetchedEvents.add(child.getValue(Event.class).toWeekViewEvent());
+                                }
+
+                                onMonthChange(newYear, newMonth);
+                                weekView.notifyDatasetChanged();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {}
+                        });
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
     }
 }
