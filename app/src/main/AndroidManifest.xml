@@ -25,7 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ReservationsActivity"/>
+        <activity
+            android:name=".activity.ReservationsActivity"
+            android:label="@string/reservations"
+            />
     </application>
 
 </manifest>

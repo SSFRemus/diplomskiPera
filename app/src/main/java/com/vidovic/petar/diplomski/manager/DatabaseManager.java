@@ -13,7 +13,33 @@ import java.util.List;
 
 public abstract class DatabaseManager {
 
-    public static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("events");
+    private static DatabaseReference room26DatabaseReference = FirebaseDatabase.getInstance().getReference("events").child("26");
+    private static DatabaseReference room25DatabaseReference = FirebaseDatabase.getInstance().getReference("events").child("25");
+    private static DatabaseReference room26BDatabaseReference = FirebaseDatabase.getInstance().getReference("events").child("26B");
+    private static DatabaseReference room60DatabaseReference = FirebaseDatabase.getInstance().getReference("events").child("60");
+    private static DatabaseReference room70DatabaseReference = FirebaseDatabase.getInstance().getReference("events").child("70");
+
+    public static DatabaseReference databaseReference = room26DatabaseReference;
+
+    public static void room26() {
+        databaseReference = room26DatabaseReference;
+    }
+
+    public static void room25() {
+        databaseReference = room25DatabaseReference;
+    }
+
+    public static void room26B() {
+        databaseReference = room26BDatabaseReference;
+    }
+
+    public static void room60() {
+        databaseReference = room60DatabaseReference;
+    }
+
+    public static void room70() {
+        databaseReference = room70DatabaseReference;
+    }
 
     public static List<WeekViewEvent> fetchedEvents = new ArrayList<>();
 

@@ -56,7 +56,6 @@ public class Event {
     public WeekViewEvent toWeekViewEvent() {
         WeekViewEvent weekViewEvent = new WeekViewEvent(0, eventName, year, month, day, startHour, startMinute, year, month, day, endHour, endMinute);
         weekViewEvent.setLocation(location);
-        weekViewEvent.setColor(R.color.colorPrimary);
 
         return weekViewEvent;
     }

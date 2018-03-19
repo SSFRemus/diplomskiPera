@@ -10,17 +10,67 @@ tools:context="com.vidovic.petar.diplomski.activity.ReservationsActivity">
         android:id="@+id/weekView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/tabLayout"
+        app:columnGap="8dp"
+        app:dayBackgroundColor="#05000000"
         app:eventTextColor="@android:color/white"
-        app:textSize="12sp"
-        app:hourHeight="60dp"
+        app:headerColumnBackground="#ffffffff"
         app:headerColumnPadding="8dp"
         app:headerColumnTextColor="#8f000000"
-        app:headerRowPadding="12dp"
-        app:columnGap="8dp"
-        app:noOfVisibleDays="3"
         app:headerRowBackgroundColor="#ffefefef"
-        app:dayBackgroundColor="#05000000"
-        app:todayBackgroundColor="#1848adff"
-        app:headerColumnBackground="#ffffffff"/>
+        app:headerRowPadding="12dp"
+        app:hourHeight="60dp"
+        app:noOfVisibleDays="3"
+        app:textSize="12sp"
+        app:todayBackgroundColor="#1848adff" />
+
+    <android.support.design.widget.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/tabLayout">
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/room26"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/room26" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/room25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/room25" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/room60"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/room60" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/room26B"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/room26B" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/room70"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/room70" />
+    </android.support.design.widget.TabLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:minWidth="50dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:indeterminate="true"/>
 
 </RelativeLayout>
