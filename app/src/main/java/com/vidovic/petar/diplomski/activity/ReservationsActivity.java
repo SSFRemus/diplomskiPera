@@ -1,6 +1,5 @@
 package com.vidovic.petar.diplomski.activity;
 
-import android.app.ProgressDialog;
 import android.graphics.RectF;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +13,7 @@ import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.vidovic.petar.diplomski.R;
 import com.vidovic.petar.diplomski.manager.DatabaseManager;
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
 
 public class ReservationsActivity extends AppCompatActivity implements MonthLoader.MonthChangeListener, WeekView.EventClickListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
 
@@ -32,11 +31,26 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
     private TabLayout tabLayout;
     private ProgressBar progressBar;
 
+    private DataSnapshot eventsSnapshot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_public_reservations);
+
+        FirebaseDatabase.getInstance().getReference("events").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                eventsSnapshot = dataSnapshot;
+                weekView.notifyDatasetChanged();
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        weekView = findViewById(R.id.weekView);
 
         progressBar = findViewById(R.id.progressBar);
 
@@ -45,31 +59,26 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                final int year = weekView.getFirstVisibleDay().get(Calendar.YEAR);
-                final int month = weekView.getFirstVisibleDay().get(Calendar.MONTH) + 1;
-
-                progressBar.setVisibility(View.VISIBLE);
-
                 switch ((String) tab.getText()) {
                     case "26":
                         DatabaseManager.room26();
-                        fetchEvents(year, month);
+                        weekView.notifyDatasetChanged();
                         break;
                     case "25":
                         DatabaseManager.room25();
-                        fetchEvents(year, month);
+                        weekView.notifyDatasetChanged();
                         break;
                     case "26B":
                         DatabaseManager.room26B();
-                        fetchEvents(year, month);
+                        weekView.notifyDatasetChanged();
                         break;
                     case "60":
                         DatabaseManager.room60();
-                        fetchEvents(year, month);
+                        weekView.notifyDatasetChanged();
                         break;
                     case "70":
                         DatabaseManager.room70();
-                        fetchEvents(year, month);
+                        weekView.notifyDatasetChanged();
                         break;
                 }
             }
@@ -80,8 +89,6 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-
-        weekView = findViewById(R.id.weekView);
 
         weekView.setMonthChangeListener(this);
         weekView.setOnEventClickListener(this);
@@ -104,25 +111,21 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
         });
 
         weekView.goToHour(8);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
         final List<WeekViewEvent> events = new ArrayList<>();
 
-        final List<WeekViewEvent> newMonthEvents = new ArrayList<>();
+        if (eventsSnapshot != null) {
+            DataSnapshot currentMonthSnapshot = eventsSnapshot.child((String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText())
+                    .child(Integer.toString(newYear)).child(Integer.toString(newMonth));
 
-        DatabaseManager.fetchedEvents.forEach(new Consumer<WeekViewEvent>() {
-            @Override
-            public void accept(WeekViewEvent weekViewEvent) {
-                if (weekViewEvent.getStartTime().get(Calendar.MONTH) == newMonth - 1 &&
-                        weekViewEvent.getStartTime().get(Calendar.YEAR) == newYear) {
-                    newMonthEvents.add(weekViewEvent);
-                }
+            for (DataSnapshot child: currentMonthSnapshot.getChildren()) {
+                events.add(child.getValue(Event.class).toWeekViewEvent());
             }
-        });
-
-        events.addAll(newMonthEvents);
+        }
 
         greyOutNonWorkingHours(events, newYear, newMonth);
 
@@ -191,21 +194,19 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
         int day = time.get(Calendar.DAY_OF_MONTH);
         int startHour = time.get(Calendar.HOUR_OF_DAY);
 
-        final Calendar finalTime = time;
-
-        Event event = new Event(time.get(Calendar.YEAR), time.get(Calendar.MONTH) + 1, day, startHour, 0, startHour + 1, 0, (String)  tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText(), "Test event");
+        Event event = new Event(
+                time.get(Calendar.YEAR),
+                time.get(Calendar.MONTH) + 1,
+                day,
+                startHour,
+                0,
+                startHour + 1,
+                0,
+                (String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText(),
+                "Test event"
+        );
 
         DatabaseManager.databaseReference.child(year).child(month).push().setValue(event);
-
-        DatabaseManager.databaseReference.child(year).child(month).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                fetchEvents(finalTime.get(Calendar.YEAR), finalTime.get(Calendar.MONTH) + 1 );
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
     }
 
     @Override
@@ -214,57 +215,5 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
 
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
-    }
-
-    private void fetchEvents(final int newYear, final int newMonth) {
-        final String year = Integer.toString(newYear);
-        final String month = Integer.toString(newMonth);
-        final String previousMonth = Integer.toString(newMonth - 1);
-        final String nextMonth = Integer.toString(newMonth + 1);
-
-        DatabaseManager.fetchedEvents.clear();
-
-        DatabaseManager.databaseReference.child(year).child(month).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    DatabaseManager.fetchedEvents.add(child.getValue(Event.class).toWeekViewEvent());
-                }
-
-                DatabaseManager.databaseReference.child(year).child(previousMonth).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            DatabaseManager.fetchedEvents.add(child.getValue(Event.class).toWeekViewEvent());
-                        }
-
-                        DatabaseManager.databaseReference.child(year).child(nextMonth).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                    DatabaseManager.fetchedEvents.add(child.getValue(Event.class).toWeekViewEvent());
-                                }
-
-                                onMonthChange(newYear, newMonth);
-                                weekView.notifyDatasetChanged();
-                                progressBar.setVisibility(View.GONE);
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {}
-                        });
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {}
-                });
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
     }
 }
