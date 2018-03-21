@@ -2,6 +2,8 @@ package com.vidovic.petar.diplomski.activity;
 
 import android.graphics.RectF;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +18,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.vidovic.petar.diplomski.R;
+import com.vidovic.petar.diplomski.fragment.ReservationDialogFragment;
+import com.vidovic.petar.diplomski.fragment.ReservationDialogFragmentCallback;
 import com.vidovic.petar.diplomski.manager.DatabaseManager;
 import com.vidovic.petar.diplomski.model.Event;
 
@@ -25,7 +29,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class ReservationsActivity extends AppCompatActivity implements MonthLoader.MonthChangeListener, WeekView.EventClickListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
+public class ReservationsActivity extends AppCompatActivity implements ReservationDialogFragmentCallback, MonthLoader.MonthChangeListener, WeekView.EventClickListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
 
     private WeekView weekView;
     private TabLayout tabLayout;
@@ -41,6 +45,7 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
         FirebaseDatabase.getInstance().getReference("events").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                progressBar.setVisibility(View.VISIBLE);
                 eventsSnapshot = dataSnapshot;
                 weekView.notifyDatasetChanged();
                 progressBar.setVisibility(View.GONE);
@@ -151,8 +156,8 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
             Calendar beforeOpeningEndTime = Calendar.getInstance();
 
             beforeOpeningEndTime.set(Calendar.DAY_OF_MONTH, i);
-            beforeOpeningEndTime.set(Calendar.HOUR_OF_DAY, 8);
-            beforeOpeningEndTime.set(Calendar.MINUTE, 0);
+            beforeOpeningEndTime.set(Calendar.HOUR_OF_DAY, 7);
+            beforeOpeningEndTime.set(Calendar.MINUTE, 59);
             beforeOpeningEndTime.set(Calendar.SECOND, 0);
             beforeOpeningEndTime.set(Calendar.MONTH, newMonth - 1);
             beforeOpeningEndTime.set(Calendar.YEAR, newYear);
@@ -165,7 +170,7 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
 
             afterClosingStartTime.set(Calendar.DAY_OF_MONTH, i);
             afterClosingStartTime.set(Calendar.HOUR_OF_DAY, 22);
-            afterClosingStartTime.set(Calendar.MINUTE, 0);
+            afterClosingStartTime.set(Calendar.MINUTE, 00);
             afterClosingStartTime.set(Calendar.SECOND, 0);
             afterClosingStartTime.set(Calendar.MONTH, newMonth - 1);
             afterClosingStartTime.set(Calendar.YEAR, newYear);
@@ -187,23 +192,30 @@ public class ReservationsActivity extends AppCompatActivity implements MonthLoad
 
     @Override
     public void onEmptyViewLongPress(Calendar time) {
+        ReservationDialogFragment dialogFragment = ReservationDialogFragment.newInstance(time);
+        dialogFragment.callback = this;
+        dialogFragment.show(getSupportFragmentManager(), "Nova rezervacija");
+    }
+
+    @Override
+    public void onReserve(Calendar startTIme, Calendar endTime, String name) {
         progressBar.setVisibility(View.VISIBLE);
 
-        String year = Integer.toString(time.get(Calendar.YEAR));
-        String month = Integer.toString(time.get(Calendar.MONTH) + 1);
-        int day = time.get(Calendar.DAY_OF_MONTH);
-        int startHour = time.get(Calendar.HOUR_OF_DAY);
+        String year = Integer.toString(startTIme.get(Calendar.YEAR));
+        String month = Integer.toString(startTIme.get(Calendar.MONTH) + 1);
+        int day = startTIme.get(Calendar.DAY_OF_MONTH);
+        int startHour = startTIme.get(Calendar.HOUR_OF_DAY);
 
         Event event = new Event(
-                time.get(Calendar.YEAR),
-                time.get(Calendar.MONTH) + 1,
+                startTIme.get(Calendar.YEAR),
+                startTIme.get(Calendar.MONTH) + 1,
                 day,
                 startHour,
-                0,
-                startHour + 1,
-                0,
+                startTIme.get(Calendar.MINUTE),
+                endTime.get(Calendar.HOUR_OF_DAY),
+                endTime.get(Calendar.MINUTE),
                 (String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText(),
-                "Test event"
+                name
         );
 
         DatabaseManager.databaseReference.child(year).child(month).push().setValue(event);

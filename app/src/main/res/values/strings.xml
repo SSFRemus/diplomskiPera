@@ -6,4 +6,7 @@
     <string name="room26B">26B</string>
     <string name="room60">60</string>
     <string name="room70">70</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

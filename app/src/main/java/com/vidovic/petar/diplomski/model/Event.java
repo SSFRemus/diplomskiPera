@@ -54,10 +54,23 @@ public class Event {
     }
 
     public WeekViewEvent toWeekViewEvent() {
-        WeekViewEvent weekViewEvent = new WeekViewEvent(0, eventName, year, month, day, startHour, startMinute, year, month, day, endHour, endMinute);
-        weekViewEvent.setLocation(location);
+        Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.YEAR, year);
+        startTime.set(Calendar.MONTH, month - 1);
+        startTime.set(Calendar.DAY_OF_MONTH, day);
+        startTime.set(Calendar.HOUR_OF_DAY, startHour);
+        startTime.set(Calendar.MINUTE, startMinute);
+        startTime.set(Calendar.SECOND, 0);
 
-        return weekViewEvent;
+        Calendar endTime = Calendar.getInstance();
+        endTime.set(Calendar.YEAR, year);
+        endTime.set(Calendar.MONTH, month - 1);
+        endTime.set(Calendar.DAY_OF_MONTH, day);
+        endTime.set(Calendar.HOUR_OF_DAY, endHour);
+        endTime.set(Calendar.MINUTE, endMinute - 1);
+        endTime.set(Calendar.SECOND, 0);
+
+        return new WeekViewEvent(0, eventName, location, startTime, endTime);
     }
 
     public int getYear() {
