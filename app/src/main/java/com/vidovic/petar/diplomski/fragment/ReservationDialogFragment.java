@@ -72,9 +72,24 @@ public class ReservationDialogFragment extends DialogFragment {
                     endTime.set(Calendar.HOUR_OF_DAY, (Integer) endHourSpinner.getSelectedItem());
                     endTime.set(Calendar.MINUTE, (Integer) endMinutesSpinner.getSelectedItem());
 
-                    callback.onReserve(startTime, endTime, name);
+                    boolean isTimeCorrect = true;
 
-                    dismiss();
+                    if (startTime.get(Calendar.HOUR_OF_DAY) > endTime.get(Calendar.HOUR_OF_DAY)) {
+                        Toast.makeText(getActivity(), "Vreme rezervacije nije ispravno", Toast.LENGTH_LONG).show();
+                        isTimeCorrect = false;
+                    } else if (startTime.get(Calendar.HOUR_OF_DAY) == endTime.get(Calendar.HOUR_OF_DAY) &&
+                            startTime.get(Calendar.MINUTE) >= endTime.get(Calendar.MINUTE)) {
+                        Toast.makeText(getActivity(), "Vreme rezervacije nije ispravno", Toast.LENGTH_LONG).show();
+                        isTimeCorrect = false;
+                    }
+
+                    if (isTimeCorrect) {
+                        if (callback.onReserve(startTime, endTime, name)) {
+                            dismiss();
+                        } else {
+                            Toast.makeText(getActivity(), "Nije moguce napraviti rezervaciju u trazenom terminu", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
             }
         });

@@ -198,7 +198,7 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
     }
 
     @Override
-    public void onReserve(Calendar startTIme, Calendar endTime, String name) {
+    public boolean onReserve(Calendar startTIme, Calendar endTime, String name) {
         progressBar.setVisibility(View.VISIBLE);
 
         String year = Integer.toString(startTIme.get(Calendar.YEAR));
@@ -218,7 +218,23 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
                 name
         );
 
+        DataSnapshot currentMonthSnapshot = eventsSnapshot.child((String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText())
+                .child(year)
+                .child(month);
+
+        for (DataSnapshot child: currentMonthSnapshot.getChildren()) {
+            Event firstEvent = child.getValue(Event.class);
+
+            if (firstEvent.doEventsOverlap(event)) {
+                progressBar.setVisibility(View.GONE);
+
+                return false;
+            }
+        }
+
         DatabaseManager.databaseReference.child(year).child(month).push().setValue(event);
+
+        return true;
     }
 
     @Override
@@ -228,4 +244,5 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
     }
+
 }

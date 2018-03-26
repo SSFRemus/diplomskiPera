@@ -109,4 +109,22 @@ public class Event {
         return eventName;
     }
 
+    public boolean doEventsOverlap(Event secondEvent) {
+        Event firstEvent = this;
+
+        if (firstEvent.day != secondEvent.day || secondEvent.endHour < firstEvent.startHour || secondEvent.startHour > firstEvent.endHour) {
+            return false;
+        } else if (firstEvent.endHour == secondEvent.startHour) {
+            if (firstEvent.endMinute <= secondEvent.startMinute) {
+                return false;
+            }
+        } else if (firstEvent.startHour == secondEvent.endHour) {
+            if (firstEvent.startMinute >= secondEvent.endMinute) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

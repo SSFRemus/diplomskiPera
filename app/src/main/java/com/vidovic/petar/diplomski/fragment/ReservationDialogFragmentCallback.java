@@ -8,6 +8,6 @@ import java.util.Calendar;
 
 public interface ReservationDialogFragmentCallback {
 
-    public void onReserve(Calendar startTime, Calendar endTime, String name);
+    boolean onReserve(Calendar startTime, Calendar endTime, String name);
 
 }
