@@ -87,7 +87,7 @@ public class ReservationDialogFragment extends DialogFragment {
                         if (callback.onReserve(startTime, endTime, name)) {
                             dismiss();
                         } else {
-                            Toast.makeText(getActivity(), "Nije moguce napraviti rezervaciju u trazenom terminu", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "Nije moguće napraviti rezervaciju u traženom terminu", Toast.LENGTH_LONG).show();
                         }
                     }
                 }
