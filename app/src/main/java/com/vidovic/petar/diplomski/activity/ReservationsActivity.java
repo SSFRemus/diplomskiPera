@@ -30,6 +30,7 @@ import java.net.Inet4Address;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,7 +39,6 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
     private WeekView weekView;
     private TabLayout tabLayout;
     private ProgressBar progressBar;
-
     private DataSnapshot eventsSnapshot;
 
     @Override
@@ -243,6 +243,30 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        String startHour = Integer.toString(event.getStartTime().get(Calendar.HOUR_OF_DAY));
+        String startMinute = Integer.toString(event.getStartTime().get(Calendar.MINUTE));
+        if (event.getStartTime().get(Calendar.MINUTE) < 10) {
+            startMinute = "0" + startMinute;
+        }
+
+        String endHour;
+        String endMinute;
+
+        if (event.getEndTime().get(Calendar.MINUTE) == 59) {
+            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY) + 1);
+            endMinute = "00";
+        } else {
+            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY));
+            endMinute = Integer.toString(event.getEndTime().get(Calendar.MINUTE) + 1);
+            if (event.getEndTime().get(Calendar.MINUTE) < 9) {
+                endMinute = "0" + endMinute;
+            }
+        }
+
+        builder.setMessage(startHour + ":" + startMinute + " - " + endHour + ":" + endMinute).setTitle(event.getName());
+        builder.create().show();
     }
 
     @Override
