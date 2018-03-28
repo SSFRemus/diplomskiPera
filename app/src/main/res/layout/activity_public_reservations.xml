@@ -22,7 +22,10 @@ tools:context="com.vidovic.petar.diplomski.activity.ReservationsActivity">
         app:hourHeight="60dp"
         app:noOfVisibleDays="3"
         app:textSize="12sp"
-        app:todayBackgroundColor="#1848adff" />
+        app:todayBackgroundColor="#1848adff"
+        app:showDistinctPastFutureColor="true"
+        app:minTime="8"
+        app:maxTime="22"/>
 
     <android.support.design.widget.TabLayout
         android:layout_width="match_parent"

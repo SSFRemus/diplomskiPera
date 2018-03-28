@@ -136,62 +136,7 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
             }
         }
 
-        greyOutNonWorkingHours(events, newYear, newMonth);
-
         return events;
-    }
-
-    private void greyOutNonWorkingHours(List<WeekViewEvent> events, int newYear, int newMonth) {
-        Calendar newMonthsCalendar = Calendar.getInstance();
-        newMonthsCalendar.set(Calendar.MONTH, newMonth - 1);
-
-        int daysInCurrentMonth = newMonthsCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-        for (int i = 1; i <= daysInCurrentMonth; i++) {
-            Calendar beforeOpeningStartTime = Calendar.getInstance();
-
-            beforeOpeningStartTime.set(Calendar.DAY_OF_MONTH, i);
-            beforeOpeningStartTime.set(Calendar.HOUR_OF_DAY, 0);
-            beforeOpeningStartTime.set(Calendar.MINUTE, 0);
-            beforeOpeningStartTime.set(Calendar.SECOND, 0);
-            beforeOpeningStartTime.set(Calendar.MONTH, newMonth - 1);
-            beforeOpeningStartTime.set(Calendar.YEAR, newYear);
-
-            Calendar beforeOpeningEndTime = Calendar.getInstance();
-
-            beforeOpeningEndTime.set(Calendar.DAY_OF_MONTH, i);
-            beforeOpeningEndTime.set(Calendar.HOUR_OF_DAY, 7);
-            beforeOpeningEndTime.set(Calendar.MINUTE, 59);
-            beforeOpeningEndTime.set(Calendar.SECOND, 0);
-            beforeOpeningEndTime.set(Calendar.MONTH, newMonth - 1);
-            beforeOpeningEndTime.set(Calendar.YEAR, newYear);
-
-            WeekViewEvent beforeOpeningEvent = new WeekViewEvent(1, "", beforeOpeningStartTime, beforeOpeningEndTime);
-            beforeOpeningEvent.setColor(getResources().getColor(R.color.greyColor));
-            events.add(beforeOpeningEvent);
-
-            Calendar afterClosingStartTime = Calendar.getInstance();
-
-            afterClosingStartTime.set(Calendar.DAY_OF_MONTH, i);
-            afterClosingStartTime.set(Calendar.HOUR_OF_DAY, 22);
-            afterClosingStartTime.set(Calendar.MINUTE, 00);
-            afterClosingStartTime.set(Calendar.SECOND, 0);
-            afterClosingStartTime.set(Calendar.MONTH, newMonth - 1);
-            afterClosingStartTime.set(Calendar.YEAR, newYear);
-
-            Calendar afterClosingEndTime = Calendar.getInstance();
-
-            afterClosingEndTime.set(Calendar.DAY_OF_MONTH, i);
-            afterClosingEndTime.set(Calendar.HOUR_OF_DAY, 23);
-            afterClosingEndTime.set(Calendar.MINUTE, 59);
-            afterClosingEndTime.set(Calendar.SECOND, 0);
-            afterClosingEndTime.set(Calendar.MONTH, newMonth - 1);
-            afterClosingEndTime.set(Calendar.YEAR, newYear);
-
-            WeekViewEvent afterClosingEvent = new WeekViewEvent(2, "", afterClosingStartTime, afterClosingEndTime);
-            afterClosingEvent.setColor(getResources().getColor(R.color.greyColor));
-            events.add(afterClosingEvent);
-        }
     }
 
     @Override
