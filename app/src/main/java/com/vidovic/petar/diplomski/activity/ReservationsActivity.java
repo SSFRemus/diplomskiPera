@@ -2,10 +2,7 @@ package com.vidovic.petar.diplomski.activity;
 
 import android.content.DialogInterface;
 import android.graphics.RectF;
-import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,11 +23,9 @@ import com.vidovic.petar.diplomski.fragment.ReservationDialogFragmentCallback;
 import com.vidovic.petar.diplomski.manager.DatabaseManager;
 import com.vidovic.petar.diplomski.model.Event;
 
-import java.net.Inet4Address;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 

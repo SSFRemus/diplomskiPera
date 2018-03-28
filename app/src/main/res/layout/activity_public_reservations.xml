@@ -11,7 +11,7 @@ tools:context="com.vidovic.petar.diplomski.activity.ReservationsActivity">
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/tabLayout"
-        app:columnGap="8dp"
+        app:columnGap="4dp"
         app:dayBackgroundColor="#05000000"
         app:eventTextColor="@android:color/white"
         app:headerColumnBackground="#ffffffff"
@@ -22,10 +22,11 @@ tools:context="com.vidovic.petar.diplomski.activity.ReservationsActivity">
         app:hourHeight="60dp"
         app:noOfVisibleDays="3"
         app:textSize="12sp"
-        app:todayBackgroundColor="#1848adff"
-        app:showDistinctPastFutureColor="true"
+        app:todayBackgroundColor="@color/colorAccent"
         app:minTime="8"
-        app:maxTime="22"/>
+        app:maxTime="22"
+        app:eventCornerRadius="5dp"
+        app:eventMarginVertical="0.5dp" />
 
     <android.support.design.widget.TabLayout
         android:layout_width="match_parent"

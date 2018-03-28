@@ -1,5 +1,8 @@
 package com.vidovic.petar.diplomski.model;
 
+import android.graphics.Shader;
+
+import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.vidovic.petar.diplomski.R;
 
@@ -11,6 +14,7 @@ import java.util.Calendar;
 
 public class Event {
 
+    private String id;
     public int year;
     public int month;
     public int day;
@@ -70,7 +74,7 @@ public class Event {
         endTime.set(Calendar.MINUTE, endMinute - 1);
         endTime.set(Calendar.SECOND, 0);
 
-        return new WeekViewEvent(0, eventName, location, startTime, endTime);
+        return new WeekViewEvent("0", eventName, location, startTime, endTime);
     }
 
     public int getYear() {
