@@ -71,7 +71,7 @@ public class Event {
         endTime.set(Calendar.MONTH, month - 1);
         endTime.set(Calendar.DAY_OF_MONTH, day);
         endTime.set(Calendar.HOUR_OF_DAY, endHour);
-        endTime.set(Calendar.MINUTE, endMinute - 1);
+        endTime.set(Calendar.MINUTE, endMinute);
         endTime.set(Calendar.SECOND, 0);
 
         return new WeekViewEvent("0", eventName, location, startTime, endTime);

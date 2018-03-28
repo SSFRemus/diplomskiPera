@@ -191,19 +191,23 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
             startMinute = "0" + startMinute;
         }
 
-        String endHour;
-        String endMinute;
+        String endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY));
+        String endMinute = Integer.toString(event.getEndTime().get(Calendar.MINUTE));
 
-        if (event.getEndTime().get(Calendar.MINUTE) == 59) {
-            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY) + 1);
-            endMinute = "00";
-        } else {
-            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY));
-            endMinute = Integer.toString(event.getEndTime().get(Calendar.MINUTE) + 1);
-            if (event.getEndTime().get(Calendar.MINUTE) < 9) {
-                endMinute = "0" + endMinute;
-            }
+        if (event.getEndTime().get(Calendar.MINUTE) < 10) {
+            endMinute = "0" + startMinute;
         }
+
+//        if (event.getEndTime().get(Calendar.MINUTE) == 59) {
+//            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY) + 1);
+//            endMinute = "00";
+//        } else {
+//            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY));
+//            endMinute = Integer.toString(event.getEndTime().get(Calendar.MINUTE) + 1);
+//            if (event.getEndTime().get(Calendar.MINUTE) < 9) {
+//                endMinute = "0" + endMinute;
+//            }
+//        }
 
         builder.setMessage(startHour + ":" + startMinute + " - " + endHour + ":" + endMinute).setTitle(event.getName());
         builder.create().show();
@@ -223,16 +227,16 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
                 final Integer day = event.getStartTime().get(Calendar.DAY_OF_MONTH);
                 final Integer startHour = event.getStartTime().get(Calendar.HOUR_OF_DAY);
                 final Integer startMinute = event.getStartTime().get(Calendar.MINUTE);
-                final Integer endHour;
-                final Integer endMinute;
+                final Integer endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
+                final Integer endMinute = event.getEndTime().get(Calendar.MINUTE);
 
-                if (event.getEndTime().get(Calendar.MINUTE) == 59) {
-                    endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY) + 1;
-                    endMinute = 0;
-                } else {
-                    endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
-                    endMinute = event.getEndTime().get(Calendar.MINUTE) + 1;
-                }
+//                if (event.getEndTime().get(Calendar.MINUTE) == 59) {
+//                    endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY) + 1;
+//                    endMinute = 0;
+//                } else {
+//                    endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
+//                    endMinute = event.getEndTime().get(Calendar.MINUTE) + 1;
+//                }
 
                 DatabaseManager.databaseReference
                         .child(Integer.toString(year))
