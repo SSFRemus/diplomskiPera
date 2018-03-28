@@ -114,7 +114,7 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
             }
 
             @Override
-            public String interpretTime(int hour) {
+            public String interpretTime(int hour, int minutes) {
                 return hour < 10 ? "0" + hour + ":00" : hour + ":00";
             }
         });
