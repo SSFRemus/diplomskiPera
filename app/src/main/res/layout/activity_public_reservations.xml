@@ -26,7 +26,8 @@ tools:context="com.vidovic.petar.diplomski.activity.ReservationsActivity">
         app:minTime="8"
         app:maxTime="22"
         app:eventCornerRadius="5dp"
-        app:eventMarginVertical="0.5dp" />
+        app:eventMarginVertical="0.5dp"
+        app:minOverlappingMinutes="5"/>
 
     <android.support.design.widget.TabLayout
         android:layout_width="match_parent"

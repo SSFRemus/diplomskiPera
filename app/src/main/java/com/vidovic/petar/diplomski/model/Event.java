@@ -55,7 +55,7 @@ public class Event {
         endTime.set(Calendar.MINUTE, endMinute);
         endTime.set(Calendar.SECOND, 0);
 
-        return new WeekViewEvent("0", eventName, location, startTime, endTime);
+        return new WeekViewEvent("0", eventName, startTime, endTime);
     }
 
     public int getYear() {

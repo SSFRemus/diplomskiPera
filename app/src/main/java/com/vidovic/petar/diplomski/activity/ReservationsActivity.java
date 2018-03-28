@@ -198,23 +198,16 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
             endMinute = "0" + startMinute;
         }
 
-//        if (event.getEndTime().get(Calendar.MINUTE) == 59) {
-//            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY) + 1);
-//            endMinute = "00";
-//        } else {
-//            endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY));
-//            endMinute = Integer.toString(event.getEndTime().get(Calendar.MINUTE) + 1);
-//            if (event.getEndTime().get(Calendar.MINUTE) < 9) {
-//                endMinute = "0" + endMinute;
-//            }
-//        }
-
         builder.setMessage(startHour + ":" + startMinute + " - " + endHour + ":" + endMinute).setTitle(event.getName());
         builder.create().show();
     }
 
     @Override
     public void onEventLongPress(final WeekViewEvent event, RectF eventRect) {
+        if (event.getStartTime().before(Calendar.getInstance())) {
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setMessage(event.getName()).setTitle("Otkazivanje rezervacije");
@@ -229,14 +222,6 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
                 final Integer startMinute = event.getStartTime().get(Calendar.MINUTE);
                 final Integer endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
                 final Integer endMinute = event.getEndTime().get(Calendar.MINUTE);
-
-//                if (event.getEndTime().get(Calendar.MINUTE) == 59) {
-//                    endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY) + 1;
-//                    endMinute = 0;
-//                } else {
-//                    endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
-//                    endMinute = event.getEndTime().get(Calendar.MINUTE) + 1;
-//                }
 
                 DatabaseManager.databaseReference
                         .child(Integer.toString(year))
