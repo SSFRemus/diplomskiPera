@@ -14,7 +14,6 @@ import java.util.Calendar;
 
 public class Event {
 
-    private String id;
     public int year;
     public int month;
     public int day;
@@ -37,24 +36,6 @@ public class Event {
         this.endMinute = endMinute;
         this.location = location;
         this.eventName = eventName;
-    }
-
-    public static Event getEventFromWeekViewEvent(WeekViewEvent weekViewEvent) {
-        Event event = new Event();
-
-        event.year = weekViewEvent.getStartTime().get(Calendar.YEAR);
-        event.month = weekViewEvent.getStartTime().get(Calendar.MONTH);
-        event.day = weekViewEvent.getStartTime().get(Calendar.DAY_OF_MONTH);
-
-        event.startHour = weekViewEvent.getStartTime().get(Calendar.HOUR_OF_DAY);
-        event.startMinute = weekViewEvent.getStartTime().get(Calendar.MINUTE);
-        event.endHour = weekViewEvent.getEndTime().get(Calendar.HOUR_OF_DAY);
-        event.endMinute = weekViewEvent.getEndTime().get(Calendar.MINUTE);
-
-        event.location = weekViewEvent.getLocation();
-        event.eventName = weekViewEvent.getName();
-
-        return event;
     }
 
     public WeekViewEvent toWeekViewEvent() {
