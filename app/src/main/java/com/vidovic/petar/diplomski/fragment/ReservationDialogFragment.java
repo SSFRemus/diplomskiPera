@@ -93,11 +93,11 @@ public class ReservationDialogFragment extends DialogFragment {
                     boolean isTimeCorrect = true;
 
                     if (startTime.get(Calendar.HOUR_OF_DAY) > endTime.get(Calendar.HOUR_OF_DAY)) {
-                        Toast.makeText(getActivity(), "Vreme rezervacije nije ispravno", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Vreme rezervacije nije ispravno.", Toast.LENGTH_LONG).show();
                         isTimeCorrect = false;
                     } else if (startTime.get(Calendar.HOUR_OF_DAY) == endTime.get(Calendar.HOUR_OF_DAY) &&
                             startTime.get(Calendar.MINUTE) >= endTime.get(Calendar.MINUTE)) {
-                        Toast.makeText(getActivity(), "Vreme rezervacije nije ispravno", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Vreme rezervacije nije ispravno.", Toast.LENGTH_LONG).show();
                         isTimeCorrect = false;
                     }
 
@@ -105,7 +105,7 @@ public class ReservationDialogFragment extends DialogFragment {
                         if (callback.onReserve(startTime, endTime, name)) {
                             dismiss();
                         } else {
-                            Toast.makeText(getActivity(), "Nije moguće napraviti rezervaciju u traženom terminu", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "Nije moguće napraviti rezervaciju u traženom terminu.", Toast.LENGTH_LONG).show();
                         }
                     }
                 }
