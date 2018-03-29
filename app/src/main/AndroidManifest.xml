@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
-            android:label="diplomski">
+            android:label="Pregled">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -19,8 +19,10 @@
         </activity>
         <activity
             android:name=".activity.ReservationsActivity"
-            android:label="@string/reservations"
-            />
+            android:label="@string/reservations" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:theme="@style/SplashTheme"/>
     </application>
 
 </manifest>
