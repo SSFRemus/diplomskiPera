@@ -122,11 +122,32 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
         final List<WeekViewEvent> events = new ArrayList<>();
 
+        int nextYear = (newMonth == 12) ? newYear + 1 : newYear;
+        int previousYear = (newMonth == 1) ? newYear - 1 : newYear;
+        int nextMonth = (newMonth == 12) ? 1 : newMonth + 1;
+        int previousMonth = (newMonth == 1) ? 12 : newMonth - 1;
+
+        String location = tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText().toString();
+
         if (eventsSnapshot != null) {
-            DataSnapshot currentMonthSnapshot = eventsSnapshot.child((String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText())
+            DataSnapshot currentMonthSnapshot = eventsSnapshot.child(location)
                     .child(Integer.toString(newYear)).child(Integer.toString(newMonth));
 
             for (DataSnapshot child: currentMonthSnapshot.getChildren()) {
+                events.add(child.getValue(Event.class).toWeekViewEvent());
+            }
+
+            DataSnapshot nextMonthSnapshot = eventsSnapshot.child(location)
+                    .child(Integer.toString(nextYear)).child(Integer.toString(nextMonth));
+
+            for (DataSnapshot child: nextMonthSnapshot.getChildren()) {
+                events.add(child.getValue(Event.class).toWeekViewEvent());
+            }
+
+            DataSnapshot previousMonthSnapshot = eventsSnapshot.child(location)
+                    .child(Integer.toString(previousYear)).child(Integer.toString(previousMonth));
+
+            for (DataSnapshot child: previousMonthSnapshot.getChildren()) {
                 events.add(child.getValue(Event.class).toWeekViewEvent());
             }
         }
@@ -195,7 +216,7 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
         String endMinute = Integer.toString(event.getEndTime().get(Calendar.MINUTE));
 
         if (event.getEndTime().get(Calendar.MINUTE) < 10) {
-            endMinute = "0" + startMinute;
+            endMinute = "0" + endMinute;
         }
 
         builder.setMessage(startHour + ":" + startMinute + " - " + endHour + ":" + endMinute).setTitle(event.getName());
