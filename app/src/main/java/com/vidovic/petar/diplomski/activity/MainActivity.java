@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setTitle(getResources().getString(R.string.overview));
+
         FirebaseDatabase.getInstance().getReference("events").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.standard_menu, menu);
+        menu.getItem(0).setTitle("Prijava");
         return true;
     }
 

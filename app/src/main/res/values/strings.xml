@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">diplomski</string>
-    <string name="reservations">Rezervacije</string>
+    <string name="app_name">Diplomski</string>
+    <string name="overview">Pregled</string>
+    <string name="login">Prijava</string>
+    <string name="reservations">Rezervisanje</string>
     <string name="room26">26</string>
     <string name="room25">25</string>
     <string name="room26B">26B</string>
