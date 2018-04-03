@@ -46,11 +46,12 @@ public class ReservationDialogFragment extends DialogFragment {
         final Spinner startMinutesSpinner = rootView.findViewById(R.id.startMinutesSpinner);
         final Spinner endHourSpinner = rootView.findViewById(R.id.endHourSpinner);
         final Spinner endMinutesSpinner = rootView.findViewById(R.id.endMinutesSpinner);
+        final Spinner multiplySpinner = rootView.findViewById(R.id.multiplySpinner);
         TextView startHourTextView = rootView.findViewById(R.id.startHourTextView);
 
         startHourTextView.setText(Integer.toString(startTime.get(Calendar.HOUR_OF_DAY)));
 
-        setFixedSpinners(startMinutesSpinner, endMinutesSpinner, endHourSpinner);
+        setFixedSpinners(startMinutesSpinner, endMinutesSpinner, endHourSpinner, multiplySpinner);
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +91,8 @@ public class ReservationDialogFragment extends DialogFragment {
                     endTime.set(Calendar.HOUR_OF_DAY, (Integer) endHourSpinner.getSelectedItem());
                     endTime.set(Calendar.MINUTE, (Integer) endMinutesSpinner.getSelectedItem());
 
+                    Integer multiply = (Integer) multiplySpinner.getSelectedItem() + 1;
+
                     boolean isTimeCorrect = true;
 
                     if (startTime.get(Calendar.HOUR_OF_DAY) > endTime.get(Calendar.HOUR_OF_DAY)) {
@@ -102,7 +105,7 @@ public class ReservationDialogFragment extends DialogFragment {
                     }
 
                     if (isTimeCorrect) {
-                        if (callback.onReserve(startTime, endTime, name)) {
+                        if (callback.onReserve(startTime, endTime, name, multiply)) {
                             dismiss();
                         } else {
                             Toast.makeText(getActivity(), "Nije moguće napraviti rezervaciju u traženom terminu.", Toast.LENGTH_LONG).show();
@@ -115,7 +118,7 @@ public class ReservationDialogFragment extends DialogFragment {
         return rootView;
     }
 
-    private void setFixedSpinners(Spinner startMinutesSpinner, Spinner endMinutesSpinner, Spinner endHourSpinner) {
+    private void setFixedSpinners(Spinner startMinutesSpinner, Spinner endMinutesSpinner, Spinner endHourSpinner, Spinner multiplySpinner) {
         List<Integer> list = new ArrayList<>();
 
         list.add(0);
@@ -136,9 +139,21 @@ public class ReservationDialogFragment extends DialogFragment {
         }
 
         ArrayAdapter hourAdapter = new ArrayAdapter(this.getContext(), R.layout.support_simple_spinner_dropdown_item, hourList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        hourAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         endHourSpinner.setAdapter(hourAdapter);
+
+        List<Integer> multiplyList = new ArrayList<>();
+
+        multiplyList.add(1);
+        multiplyList.add(2);
+        multiplyList.add(3);
+        multiplyList.add(4);
+
+        ArrayAdapter multiplyAdapter = new ArrayAdapter(this.getContext(), R.layout.support_simple_spinner_dropdown_item, multiplyList);
+        multiplyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        multiplySpinner.setAdapter(multiplyAdapter);
     }
 
 }

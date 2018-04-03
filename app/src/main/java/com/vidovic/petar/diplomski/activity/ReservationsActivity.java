@@ -179,41 +179,56 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
     }
 
     @Override
-    public boolean onReserve(Calendar startTime, Calendar endTime, String name) {
+    public boolean onReserve(Calendar startTime, Calendar endTime, String name, Integer multiply) {
         progressBar.setVisibility(View.VISIBLE);
 
-        String year = Integer.toString(startTime.get(Calendar.YEAR));
-        String month = Integer.toString(startTime.get(Calendar.MONTH) + 1);
-        int day = startTime.get(Calendar.DAY_OF_MONTH);
-        int startHour = startTime.get(Calendar.HOUR_OF_DAY);
+        ArrayList<Event> events = new ArrayList<>();
 
-        Event event = new Event(
-                startTime.get(Calendar.YEAR),
-                startTime.get(Calendar.MONTH) + 1,
-                day,
-                startHour,
-                startTime.get(Calendar.MINUTE),
-                endTime.get(Calendar.HOUR_OF_DAY),
-                endTime.get(Calendar.MINUTE),
-                (String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText(),
-                name
-        );
+        for (int i = 0; i < multiply; i++) {
+            Calendar tempStartTime = (Calendar) startTime.clone();
+            Calendar tempEndTime = (Calendar) endTime.clone();
+            tempStartTime.add(Calendar.DAY_OF_MONTH, i * 7);
+            tempEndTime.add(Calendar.DAY_OF_MONTH, i * 7);
 
-        DataSnapshot currentMonthSnapshot = eventsSnapshot.child((String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText())
-                .child(year)
-                .child(month);
+            String year = Integer.toString(tempStartTime.get(Calendar.YEAR));
+            String month = Integer.toString(tempStartTime.get(Calendar.MONTH) + 1);
+            int day = tempStartTime.get(Calendar.DAY_OF_MONTH);
+            int startHour = tempStartTime.get(Calendar.HOUR_OF_DAY);
 
-        for (DataSnapshot child: currentMonthSnapshot.getChildren()) {
-            Event firstEvent = child.getValue(Event.class);
+            Event event = new Event(
+                    tempStartTime.get(Calendar.YEAR),
+                    tempStartTime.get(Calendar.MONTH) + 1,
+                    day,
+                    startHour,
+                    tempStartTime.get(Calendar.MINUTE),
+                    tempEndTime.get(Calendar.HOUR_OF_DAY),
+                    tempEndTime.get(Calendar.MINUTE),
+                    (String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText(),
+                    name
+            );
 
-            if (firstEvent.doEventsOverlap(event)) {
-                progressBar.setVisibility(View.GONE);
+            DataSnapshot currentMonthSnapshot = eventsSnapshot.child((String) tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText())
+                    .child(year)
+                    .child(month);
 
-                return false;
+            for (DataSnapshot child : currentMonthSnapshot.getChildren()) {
+                Event firstEvent = child.getValue(Event.class);
+
+                if (firstEvent.doEventsOverlap(event)) {
+                    progressBar.setVisibility(View.GONE);
+
+                    return false;
+                }
             }
+
+            events.add(event);
         }
 
-        DatabaseManager.databaseReference.child(year).child(month).push().setValue(event);
+        for (Event event: events) {
+            DatabaseManager.databaseReference.child(Integer.toString(event.getYear())).child(Integer.toString(event.getMonth())).push().setValue(event);
+        }
+
+        progressBar.setVisibility(View.GONE);
 
         return true;
     }
