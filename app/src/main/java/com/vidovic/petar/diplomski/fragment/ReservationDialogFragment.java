@@ -91,7 +91,7 @@ public class ReservationDialogFragment extends DialogFragment {
                     endTime.set(Calendar.HOUR_OF_DAY, (Integer) endHourSpinner.getSelectedItem());
                     endTime.set(Calendar.MINUTE, (Integer) endMinutesSpinner.getSelectedItem());
 
-                    Integer multiply = (Integer) multiplySpinner.getSelectedItem() + 1;
+                    Integer multiply = (Integer) multiplySpinner.getSelectedItem();
 
                     boolean isTimeCorrect = true;
 
