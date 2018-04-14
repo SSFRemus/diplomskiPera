@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CancellationException;
 
 public class ReservationsActivity extends AppCompatActivity implements ReservationDialogFragmentCallback, MonthLoader.MonthChangeListener, WeekView.EventClickListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
 
@@ -265,7 +266,6 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
 
         builder.setPositiveButton("Otkaži", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-
                 final Integer year = event.getStartTime().get(Calendar.YEAR);
                 final Integer month = event.getStartTime().get(Calendar.MONTH) + 1;
                 final Integer day = event.getStartTime().get(Calendar.DAY_OF_MONTH);
@@ -301,7 +301,52 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
             }
         });
 
-        builder.setNegativeButton("Izađi", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Otkaži sva ponavljanja", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for (int i = 0; i < 15; i++) {
+                    Calendar currentEventStartTime = (Calendar) event.getStartTime().clone();
+                    currentEventStartTime.add(Calendar.DAY_OF_MONTH, i * 7);
+
+                    final String name = event.getName();
+                    final Integer year = currentEventStartTime.get(Calendar.YEAR);
+                    final Integer month = currentEventStartTime.get(Calendar.MONTH) + 1;
+                    final Integer day = currentEventStartTime.get(Calendar.DAY_OF_MONTH);
+                    final Integer startHour = event.getStartTime().get(Calendar.HOUR_OF_DAY);
+                    final Integer startMinute = event.getStartTime().get(Calendar.MINUTE);
+                    final Integer endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
+                    final Integer endMinute = event.getEndTime().get(Calendar.MINUTE);
+
+                    DatabaseManager.databaseReference
+                            .child(Integer.toString(year))
+                            .child(Integer.toString(month)).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                Event fetchedEvent = data.getValue(Event.class);
+
+                                if (fetchedEvent.eventName.equals(name) && fetchedEvent.day == day &&
+                                        fetchedEvent.startHour == startHour && fetchedEvent.startMinute == startMinute &&
+                                        fetchedEvent.endHour == endHour && fetchedEvent.endMinute == endMinute) {
+
+                                    DatabaseManager.databaseReference
+                                            .child(Integer.toString(year))
+                                            .child(Integer.toString(month))
+                                            .child(data.getKey()).removeValue();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
+            }
+        });
+
+        builder.setNeutralButton("Izađi", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
