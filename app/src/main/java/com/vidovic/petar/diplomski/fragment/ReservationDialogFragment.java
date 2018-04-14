@@ -53,6 +53,8 @@ public class ReservationDialogFragment extends DialogFragment {
 
         setFixedSpinners(startMinutesSpinner, endMinutesSpinner, endHourSpinner, multiplySpinner);
 
+        endHourSpinner.setSelection(startTime.get(Calendar.HOUR_OF_DAY) - 7);
+
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,10 +147,9 @@ public class ReservationDialogFragment extends DialogFragment {
 
         List<Integer> multiplyList = new ArrayList<>();
 
-        multiplyList.add(1);
-        multiplyList.add(2);
-        multiplyList.add(3);
-        multiplyList.add(4);
+        for (int j = 1; j <= 15; j++) {
+            multiplyList.add(j);
+        }
 
         ArrayAdapter multiplyAdapter = new ArrayAdapter(this.getContext(), R.layout.support_simple_spinner_dropdown_item, multiplyList);
         multiplyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

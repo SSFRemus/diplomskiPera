@@ -245,7 +245,6 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
 
         String endHour = Integer.toString(event.getEndTime().get(Calendar.HOUR_OF_DAY));
         String endMinute = Integer.toString(event.getEndTime().get(Calendar.MINUTE));
-
         if (event.getEndTime().get(Calendar.MINUTE) < 10) {
             endMinute = "0" + endMinute;
         }
