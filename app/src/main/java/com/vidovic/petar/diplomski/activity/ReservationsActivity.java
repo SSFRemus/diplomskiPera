@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CancellationException;
 
 public class ReservationsActivity extends AppCompatActivity implements ReservationDialogFragmentCallback, MonthLoader.MonthChangeListener, WeekView.EventClickListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
 
@@ -135,6 +134,8 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
         return true;
     }
 
+    public List<WeekViewEvent> getEvents(int year, int month) { return new ArrayList<WeekViewEvent>(); }
+
     @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
         final List<WeekViewEvent> events = new ArrayList<>();
@@ -197,6 +198,7 @@ public class ReservationsActivity extends AppCompatActivity implements Reservati
             int startHour = tempStartTime.get(Calendar.HOUR_OF_DAY);
 
             Event event = new Event(
+                    "0",
                     tempStartTime.get(Calendar.YEAR),
                     tempStartTime.get(Calendar.MONTH) + 1,
                     day,

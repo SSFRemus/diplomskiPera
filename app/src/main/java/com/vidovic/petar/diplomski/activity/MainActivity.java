@@ -6,6 +6,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.EventLog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.vidovic.petar.diplomski.R;
 import com.vidovic.petar.diplomski.manager.DatabaseManager;
 import com.vidovic.petar.diplomski.model.Event;
+import com.vidovic.petar.diplomski.utils.NetworkUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
     private TabLayout tabLayout;
     private ProgressBar progressBar;
     private DataSnapshot eventsSnapshot;
+    public List<Event> myEvents;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("https://rti.etf.bg.ac.rs/sale/apiView_bezBr.php?sala=26&mesec=5&godina=2018")
+                .url("https://rti.etf.bg.ac.rs/sale/apiView_bezBr.php?sala=26&mesec=2&godina=2018")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -66,6 +69,13 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
                     throw new IOException("Unexpected code " + response);
                 } else {
                     String str = response.body().string();
+
+                    ArrayList<Event> events = NetworkUtils.parseResponse(str, 2018, 2, "26");
+
+                    myEvents = events;
+
+                    String strrr = "asda";
+                    strrr += "abc";
                 }
             }
         });
@@ -163,6 +173,10 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         startActivity(intent);
         return true;
     }
+
+    private List<? extends WeekViewEvent> getEvents(int year, int month, String location) {
+        return new ArrayList<WeekViewEvent>();
+    };
 
     @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {

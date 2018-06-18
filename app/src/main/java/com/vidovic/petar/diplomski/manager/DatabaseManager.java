@@ -7,7 +7,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * Created by Pera on 18-Mar-18.
  */
 
-public abstract class DatabaseManager {
+public class DatabaseManager {
 
     private static DatabaseReference room26DatabaseReference = FirebaseDatabase.getInstance().getReference("events").child("26");
     private static DatabaseReference room25DatabaseReference = FirebaseDatabase.getInstance().getReference("events").child("25");
