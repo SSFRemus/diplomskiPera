@@ -2,8 +2,17 @@ package com.vidovic.petar.diplomski.utils;
 
 import com.vidovic.petar.diplomski.model.Event;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class NetworkUtils {
 
@@ -14,10 +23,13 @@ public class NetworkUtils {
         int numberOfCommasRead = 0;
         String currentValue = "";
 
-        boolean openBracketFound = false;
-        boolean closedBracketFound = false;
+        if (!responseBody.contains("{")) {
+            return events;
+        }
 
-        for (char character :responseBody.toCharArray()) {
+        String body = responseBody.substring(responseBody.indexOf("{"));
+
+        for (char character :body.toCharArray()) {
             if (character == '{') {
                 currentEvent = new Event();
                 currentEvent.year = currentYear;
@@ -65,6 +77,60 @@ public class NetworkUtils {
         }
 
         return events;
+    };
+
+    public static HashMap<Integer, ArrayList<Event>> getYearlyEvents(final int year, final String room) {
+        final HashMap<Integer, ArrayList<Event>> map = new HashMap<>();
+
+        for (int i = 1; i < 13; i++ ) {
+            final int month = i;
+            ArrayList<Event> events = getEventsFor(month, year, room);
+            map.put(i, events);
+        }
+
+        return map;
+    };
+
+    public static ArrayList<Event> getEventsFor(final int month, final int year, final String room) {
+        OkHttpClient client = new OkHttpClient();
+        final ArrayList<Event> events = new ArrayList<>();
+        final Object lock = new Object();
+
+        Request request = new Request.Builder()
+                .url("https://rti.etf.bg.ac.rs/sale/apiView_bezBr.php?sala=" + room + "&mesec=" + month + "&godina=" + year)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    String body = response.body().string();
+
+                    ArrayList<Event> currentEvents = NetworkUtils.parseResponse(body, year, month, room);
+
+                    synchronized (lock) {
+                        events.addAll(currentEvents);
+                        lock.notify();
+                    }
+                }
+            }
+        });
+
+        synchronized (lock) {
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return events;
+        }
     };
 
 }

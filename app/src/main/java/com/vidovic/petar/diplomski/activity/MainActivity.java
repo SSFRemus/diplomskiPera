@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,41 +46,18 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
     private TabLayout tabLayout;
     private ProgressBar progressBar;
     private DataSnapshot eventsSnapshot;
-    public List<Event> myEvents;
+    private HashMap<Integer, ArrayList<Event>> eventMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("https://rti.etf.bg.ac.rs/sale/apiView_bezBr.php?sala=26&mesec=2&godina=2018")
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    throw new IOException("Unexpected code " + response);
-                } else {
-                    String str = response.body().string();
-
-                    ArrayList<Event> events = NetworkUtils.parseResponse(str, 2018, 2, "26");
-
-                    myEvents = events;
-
-                    String strrr = "asda";
-                    strrr += "abc";
-                }
-            }
-        });
         setTitle(getResources().getString(R.string.overview));
+
+        final int year = Calendar.getInstance().get(Calendar.YEAR);
+
+        eventMap = NetworkUtils.getYearlyEvents(year, "26");
 
         FirebaseDatabase.getInstance().getReference("events").addValueEventListener(new ValueEventListener() {
             @Override
@@ -189,27 +167,16 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
 
         String location = tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText().toString();
 
-        if (eventsSnapshot != null) {
-            DataSnapshot currentMonthSnapshot = eventsSnapshot.child(location)
-                    .child(Integer.toString(newYear)).child(Integer.toString(newMonth));
+        for (Event event: eventMap.get(newMonth)) {
+            events.add(event.toWeekViewEvent());
+        }
 
-            for (DataSnapshot child: currentMonthSnapshot.getChildren()) {
-                events.add(child.getValue(Event.class).toWeekViewEvent());
-            }
+        for (Event event: eventMap.get(previousMonth)) {
+            events.add(event.toWeekViewEvent());
+        }
 
-            DataSnapshot nextMonthSnapshot = eventsSnapshot.child(location)
-                    .child(Integer.toString(nextYear)).child(Integer.toString(nextMonth));
-
-            for (DataSnapshot child: nextMonthSnapshot.getChildren()) {
-                events.add(child.getValue(Event.class).toWeekViewEvent());
-            }
-
-            DataSnapshot previousMonthSnapshot = eventsSnapshot.child(location)
-                    .child(Integer.toString(previousYear)).child(Integer.toString(previousMonth));
-
-            for (DataSnapshot child: previousMonthSnapshot.getChildren()) {
-                events.add(child.getValue(Event.class).toWeekViewEvent());
-            }
+        for (Event event: eventMap.get(nextMonth)) {
+            events.add(event.toWeekViewEvent());
         }
 
         return events;
