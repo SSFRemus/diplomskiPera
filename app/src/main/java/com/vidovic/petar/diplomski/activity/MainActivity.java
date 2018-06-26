@@ -45,8 +45,13 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
     private WeekView weekView;
     private TabLayout tabLayout;
     private ProgressBar progressBar;
-    private DataSnapshot eventsSnapshot;
     private HashMap<Integer, ArrayList<Event>> eventMap;
+
+    private HashMap<Integer, ArrayList<Event>> eventMap26;
+    private HashMap<Integer, ArrayList<Event>> eventMap25;
+    private HashMap<Integer, ArrayList<Event>> eventMap26B;
+    private HashMap<Integer, ArrayList<Event>> eventMap60;
+    private HashMap<Integer, ArrayList<Event>> eventMap70;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +62,16 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
 
         final int year = Calendar.getInstance().get(Calendar.YEAR);
 
-        eventMap = NetworkUtils.getYearlyEvents(year, "26");
+        eventMap = eventMap26 = NetworkUtils.getYearlyEvents(year, "26");
+        eventMap25 = NetworkUtils.getYearlyEvents(year, "25");
+        eventMap26B = NetworkUtils.getYearlyEvents(year, "26B");
+        eventMap60 = NetworkUtils.getYearlyEvents(year, "60");
+        eventMap70 = NetworkUtils.getYearlyEvents(year, "70");
 
         FirebaseDatabase.getInstance().getReference("events").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 progressBar.setVisibility(View.VISIBLE);
-                eventsSnapshot = dataSnapshot;
                 weekView.notifyDatasetChanged();
                 progressBar.setVisibility(View.GONE);
             }
@@ -84,23 +92,23 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
             public void onTabSelected(TabLayout.Tab tab) {
                 switch ((String) tab.getText()) {
                     case "26":
-                        DatabaseManager.room26();
+                        eventMap = eventMap26;
                         weekView.notifyDatasetChanged();
                         break;
                     case "25":
-                        DatabaseManager.room25();
+                        eventMap = eventMap25;
                         weekView.notifyDatasetChanged();
                         break;
                     case "26B":
-                        DatabaseManager.room26B();
+                        eventMap = eventMap26B;
                         weekView.notifyDatasetChanged();
                         break;
                     case "60":
-                        DatabaseManager.room60();
+                        eventMap = eventMap60;
                         weekView.notifyDatasetChanged();
                         break;
                     case "70":
-                        DatabaseManager.room70();
+                        eventMap = eventMap70;
                         weekView.notifyDatasetChanged();
                         break;
                 }

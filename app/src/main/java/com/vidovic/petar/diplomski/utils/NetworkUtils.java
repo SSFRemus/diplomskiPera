@@ -22,12 +22,14 @@ public class NetworkUtils {
 
         int numberOfCommasRead = 0;
         String currentValue = "";
+        boolean insideEvent = false;
 
         if (!responseBody.contains("{")) {
             return events;
         }
 
         String body = responseBody.substring(responseBody.indexOf("{"));
+        body = body.substring(0, body.lastIndexOf("}"));
 
         for (char character :body.toCharArray()) {
             if (character == '{') {
@@ -71,6 +73,8 @@ public class NetworkUtils {
 
                         break;
                 }
+            } else if (numberOfCommasRead == 0) {
+                currentValue += character;
             } else if (character != ' ') {
                 currentValue += character;
             }
