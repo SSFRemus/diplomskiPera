@@ -6,7 +6,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.EventLog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,28 +16,16 @@ import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.vidovic.petar.diplomski.R;
-import com.vidovic.petar.diplomski.manager.DatabaseManager;
 import com.vidovic.petar.diplomski.model.Event;
 import com.vidovic.petar.diplomski.utils.NetworkUtils;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements MonthLoader.MonthChangeListener, WeekView.EventClickListener {
 
@@ -60,30 +47,10 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
 
         setTitle(getResources().getString(R.string.overview));
 
-        final int year = Calendar.getInstance().get(Calendar.YEAR);
-
-        eventMap = eventMap26 = NetworkUtils.getYearlyEvents(year, "26");
-        eventMap25 = NetworkUtils.getYearlyEvents(year, "25");
-        eventMap26B = NetworkUtils.getYearlyEvents(year, "26B");
-        eventMap60 = NetworkUtils.getYearlyEvents(year, "60");
-        eventMap70 = NetworkUtils.getYearlyEvents(year, "70");
-
-        FirebaseDatabase.getInstance().getReference("events").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                progressBar.setVisibility(View.VISIBLE);
-                weekView.notifyDatasetChanged();
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
         weekView = findViewById(R.id.weekView);
 
         progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
 
         tabLayout = findViewById(R.id.tabLayout);
 
@@ -142,7 +109,21 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         });
 
         weekView.goToHour(8);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        final int year = Calendar.getInstance().get(Calendar.YEAR);
+
         progressBar.setVisibility(View.VISIBLE);
+        eventMap = eventMap26 = NetworkUtils.getYearlyEvents(year, "26");
+        eventMap25 = NetworkUtils.getYearlyEvents(year, "25");
+        eventMap26B = NetworkUtils.getYearlyEvents(year, "26B");
+        eventMap60 = NetworkUtils.getYearlyEvents(year, "60");
+        eventMap70 = NetworkUtils.getYearlyEvents(year, "70");
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -159,10 +140,6 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         startActivity(intent);
         return true;
     }
-
-    private List<? extends WeekViewEvent> getEvents(int year, int month, String location) {
-        return new ArrayList<WeekViewEvent>();
-    };
 
     @Override
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
@@ -207,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
             endMinute = "0" + endMinute;
         }
 
-        builder.setMessage(startHour + ":" + startMinute + " - " + endHour + ":" + endMinute).setTitle(event.getName());
+        builder.setMessage(event.getName() + "\n" + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute);
         builder.create().show();
     }
 
