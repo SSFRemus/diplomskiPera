@@ -20,6 +20,10 @@ import com.vidovic.petar.diplomski.R;
 import com.vidovic.petar.diplomski.model.Event;
 import com.vidovic.petar.diplomski.utils.NetworkUtils;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -111,6 +115,24 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         weekView.goToHour(8);
     }
 
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void onMessageEvent(NetworkUtils.MessageEvent event) {
+        //progressBar.setVisibility(View.GONE);
+        weekView.notifyDatasetChanged();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -118,12 +140,13 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         final int year = Calendar.getInstance().get(Calendar.YEAR);
 
         progressBar.setVisibility(View.VISIBLE);
-        eventMap = eventMap26 = NetworkUtils.getYearlyEvents(year, "26");
-        eventMap25 = NetworkUtils.getYearlyEvents(year, "25");
-        eventMap26B = NetworkUtils.getYearlyEvents(year, "26B");
-        eventMap60 = NetworkUtils.getYearlyEvents(year, "60");
-        eventMap70 = NetworkUtils.getYearlyEvents(year, "70");
-        progressBar.setVisibility(View.GONE);
+        eventMap = new HashMap<>();
+        eventMap26 = NetworkUtils.getYearlyEvents(year, "26", eventMap);
+//        eventMap25 = NetworkUtils.getYearlyEvents(year, "25", eventMap25);
+//        eventMap26B = NetworkUtils.getYearlyEvents(year, "26B", eventMap26B);
+//        eventMap60 = NetworkUtils.getYearlyEvents(year, "60", eventMap60);
+//        eventMap70 = NetworkUtils.getYearlyEvents(year, "70", eventMap70);
+        //progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -145,6 +168,10 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
     public List<? extends WeekViewEvent> onMonthChange(final int newYear, final int newMonth) {
         final List<WeekViewEvent> events = new ArrayList<>();
 
+        if (eventMap == null || eventMap.get(newMonth) == null) {
+            return events;
+        }
+
         int nextYear = (newMonth == 12) ? newYear + 1 : newYear;
         int previousYear = (newMonth == 1) ? newYear - 1 : newYear;
         int nextMonth = (newMonth == 12) ? 1 : newMonth + 1;
@@ -163,6 +190,10 @@ public class MainActivity extends AppCompatActivity implements MonthLoader.Month
         for (Event event: eventMap.get(nextMonth)) {
             events.add(event.toWeekViewEvent());
         }
+
+        // OVO NE ZABORAVI DA VRATIS DA BUDE SVE U JEDNOM VISIBILITIJU
+        findViewById(R.id.rl_progress_bar).setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
 
         return events;
     }

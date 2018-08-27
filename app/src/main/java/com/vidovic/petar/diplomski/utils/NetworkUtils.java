@@ -1,12 +1,16 @@
 package com.vidovic.petar.diplomski.utils;
 
+import android.os.Message;
+
 import com.vidovic.petar.diplomski.model.Event;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -15,6 +19,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class NetworkUtils {
+
+    public static class MessageEvent {
+
+    }
 
     public static ArrayList<Event> parseResponse(String responseBody, int currentYear, int currentMonth, String currentLocation) {
         ArrayList<Event> events = new ArrayList<>();
@@ -83,19 +91,19 @@ public class NetworkUtils {
         return events;
     };
 
-    public static HashMap<Integer, ArrayList<Event>> getYearlyEvents(final int year, final String room) {
-        final HashMap<Integer, ArrayList<Event>> map = new HashMap<>();
+    public static HashMap<Integer, ArrayList<Event>> getYearlyEvents(final int year, final String room, HashMap<Integer, ArrayList<Event>> map) {
+        final AtomicInteger counter = new AtomicInteger(0);
 
         for (int i = 1; i < 13; i++ ) {
-            final int month = i;
-            ArrayList<Event> events = getEventsFor(month, year, room);
-            map.put(i, events);
+            ArrayList<Event> events = getEventsFor(i, year, room, map, counter);
+            //map.put(i, events);
         }
 
+        //EventBus.getDefault().post(new MessageEvent());
         return map;
     };
 
-    public static ArrayList<Event> getEventsFor(final int month, final int year, final String room) {
+    public static ArrayList<Event> getEventsFor(final int month, final int year, final String room, final HashMap<Integer, ArrayList<Event>> map, final AtomicInteger counter) {
         OkHttpClient client = new OkHttpClient();
         final ArrayList<Event> events = new ArrayList<>();
         final Object lock = new Object();
@@ -118,23 +126,30 @@ public class NetworkUtils {
 
                     ArrayList<Event> currentEvents = NetworkUtils.parseResponse(body, year, month, room);
 
-                    synchronized (lock) {
-                        events.addAll(currentEvents);
-                        lock.notify();
+                    map.put(month, currentEvents);
+
+                    if (counter.incrementAndGet() == 12) {
+                        EventBus.getDefault().post(new MessageEvent()); // ne moram nista da prosledim, map ce se promeniti jer je referenca
                     }
+
+//                    synchronized (lock) {
+//                        events.addAll(currentEvents);
+//                        lock.notify();
+//                    }
                 }
             }
         });
 
-        synchronized (lock) {
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return events;
-        }
+//        synchronized (lock) {
+//            try {
+//                lock.wait();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//            return events;
+//        }
+        return events;
     };
 
 }
